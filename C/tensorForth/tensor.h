@@ -77,4 +77,9 @@ int writeBinary(tensor *t, const char *filename); // }
 // 10. Utilità
 void printTensor(tensor *t); // p
 
+
+// ALTRO
+void equalDimensions(int dimensionA, int dimensionB);
+void equalShapes(int rowA, int rowB, int colA, int colB);
+
 #endif
