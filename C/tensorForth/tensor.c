@@ -15,17 +15,17 @@ tensor *sum(tensor *a, tensor *b){
     equalDimensions(a->dimensionOfTensor, b->dimensionOfTensor);
     equalShapes(a->shape[0], b->shape[0], a->shape[1], b->shape[1]);
 
-    // 2. Alloca il tensore del risultato (con la stessa shape di a)
-    tensor *resultDiff = allocTensor(a->dimensionOfTensor, a->shape);
+    // 2. Alloca il tensore del risultato 
+    tensor *resultSum = allocTensor(a->dimensionOfTensor, a->shape);
 
     int32_t totalElements = a->shape[0];
     if (a->dimensionOfTensor == 2) {
         totalElements *= a->shape[1];
     }
 
-    float *aData = a->buffer->data;
-    float *bData = b->buffer->data;
-    float *resultDiffData = resultDiff->buffer->data;
+    float *dataOfA = a->buffer->data;
+    float *dataOfB = b->buffer->data;
+    float *dataResultSum = resultSum->buffer->data;
 
     int32_t limit = totalElements - (totalElements % 8);
 
@@ -35,41 +35,37 @@ tensor *sum(tensor *a, tensor *b){
         // Distribuzione del carico SIMD tra i thread
         #pragma omp for schedule(static) nowait
         for (int32_t i = 0; i < limit; i += 8) {
-            __m256 va = _mm256_loadu_ps(&aData[i]);
-            __m256 vb = _mm256_loadu_ps(&bData[i]);
-            __m256 vres = _mm256_add_ps(va, vb); // <--- Sottrazione nativa AVX (a - b)
-            _mm256_storeu_ps(&resultDiffData[i], vres);
+            __m256 va = _mm256_loadu_ps(&dataOfA[i]);
+            __m256 vb = _mm256_loadu_ps(&dataOfB[i]);
+            __m256 vres = _mm256_add_ps(va, vb); 
+            _mm256_storeu_ps(&dataResultSum[i], vres);
         }
-
-        // Il resto viene gestito fuori dal costrutto parallel per evitare race conditions,
-        // oppure usando 'single' ma SENZA 'nowait' sopra. 
-        // La soluzione più pulita e performante è chiudere il parallel prima o gestire il resto in coda in modo sicuro.
     }
 
-    // 4. Gestione del resto (elementi finali < 8) eseguita in modo sicuro sul thread principale
+    // 4. Gestione del resto (elementi finali < 8) eseguita sul thread principale
     for (int32_t i = limit; i < totalElements; i++) {
-        resultDiffData[i] = aData[i] - bData[i];
+        dataResultSum[i] = dataOfA[i] + dataOfB[i];
     }
 
-    return resultDiff;
+    return resultSum;
 }
 
-tensor *diff(tensor *a, tensor *b){
+tensor *sub(tensor *a, tensor *b){
     // 1. Controllo compatibilità dimensioni
     equalDimensions(a->dimensionOfTensor, b->dimensionOfTensor);
     equalShapes(a->shape[0], b->shape[0], a->shape[1], b->shape[1]);
 
-    // 2. Alloca il tensore del risultato (con la stessa shape di a)
-    tensor *resultDiff = allocTensor(a->dimensionOfTensor, a->shape);
+    // 2. Alloca il tensore del risultato 
+    tensor *resultSum = allocTensor(a->dimensionOfTensor, a->shape);
 
     int32_t totalElements = a->shape[0];
     if (a->dimensionOfTensor == 2) {
         totalElements *= a->shape[1];
     }
 
-    float *aData = a->buffer->data;
-    float *bData = b->buffer->data;
-    float *resultDiffData = resultDiff->buffer->data;
+    float *dataOfA = a->buffer->data;
+    float *dataOfB = b->buffer->data;
+    float *dataResultSum = resultSum->buffer->data;
 
     int32_t limit = totalElements - (totalElements % 8);
 
@@ -79,26 +75,58 @@ tensor *diff(tensor *a, tensor *b){
         // Distribuzione del carico SIMD tra i thread
         #pragma omp for schedule(static) nowait
         for (int32_t i = 0; i < limit; i += 8) {
-            __m256 va = _mm256_loadu_ps(&aData[i]);
-            __m256 vb = _mm256_loadu_ps(&bData[i]);
-            __m256 vres = _mm256_mul_ps(va, vb); // <--- Sottrazione nativa AVX (a - b)
-            _mm256_storeu_ps(&resultDiffData[i], vres);
+            __m256 va = _mm256_loadu_ps(&dataOfA[i]);
+            __m256 vb = _mm256_loadu_ps(&dataOfB[i]);
+            __m256 vres = _mm256_add_ps(va, vb); 
+            _mm256_storeu_ps(&dataResultSum[i], vres);
         }
-
-        // Il resto viene gestito fuori dal costrutto parallel per evitare race conditions,
-        // oppure usando 'single' ma SENZA 'nowait' sopra. 
-        // La soluzione più pulita e performante è chiudere il parallel prima o gestire il resto in coda in modo sicuro.
     }
-
-    // 4. Gestione del resto (elementi finali < 8) eseguita in modo sicuro sul thread principale
+    // 4. Gestione del resto (elementi finali < 8) eseguita sul thread principale
     for (int32_t i = limit; i < totalElements; i++) {
-        resultDiffData[i] = aData[i] - bData[i];
+        dataResultSum[i] = dataOfA[i] + dataOfB[i];
     }
 
-    return resultDiff;
+    return resultSum;
 }
 
-tensor *prod(tensor *a, tensor *b);
+tensor *mul(tensor *a, tensor *b){
+    // 1. Controllo compatibilità dimensioni
+    equalDimensions(a->dimensionOfTensor, b->dimensionOfTensor);
+    equalShapes(a->shape[0], b->shape[0], a->shape[1], b->shape[1]);
+
+    // 2. Alloca il tensore del risultato 
+    tensor *resultSum = allocTensor(a->dimensionOfTensor, a->shape);
+
+    int32_t totalElements = a->shape[0];
+    if (a->dimensionOfTensor == 2) {
+        totalElements *= a->shape[1];
+    }
+
+    float *dataOfA = a->buffer->data;
+    float *dataOfB = b->buffer->data;
+    float *dataResultSum = resultSum->buffer->data;
+
+    int32_t limit = totalElements - (totalElements % 8);
+
+    // 3. Regione Parallela OpenMP + AVX
+    #pragma omp parallel if(totalElements > 2000)
+    {
+        // Distribuzione del carico SIMD tra i thread
+        #pragma omp for schedule(static) nowait
+        for (int32_t i = 0; i < limit; i += 8) {
+            __m256 va = _mm256_loadu_ps(&dataOfA[i]);
+            __m256 vb = _mm256_loadu_ps(&dataOfB[i]);
+            __m256 vres = _mm256_add_ps(va, vb); // <--- Somma nativa AVX (a + b)
+            _mm256_storeu_ps(&dataResultSum[i], vres);
+        }
+    }
+
+    // 4. Gestione del resto (elementi finali < 8) eseguita sul thread principale
+    for (int32_t i = limit; i < totalElements; i++) {
+        dataResultSum[i] = dataOfA[i] + dataOfB[i];
+    }
+    return resultSum;
+}
 
 // 2. Op. comparazione
 tensor *equal(tensor *a, tensor *b); // =
@@ -198,7 +226,7 @@ void printTensor(tensor *t); // p
 // ALTRO
 void equalDimensions(int dimensionA, int dimensionB){
     if(dimensionA != dimensionB){
-		fprintf(stderr, "Dimensioni non compatibili");
+		fprintf(stderr, "Dimensioni non compati bili");
 		exit(1);
     } 
 }

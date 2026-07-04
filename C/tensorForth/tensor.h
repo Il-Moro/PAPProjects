@@ -29,8 +29,8 @@ typedef struct {
 // OPERAZIONI:
 // 1. Operazioni aritmetiche
 tensor *sum(tensor *a, tensor *b); // +
-tensor *diff(tensor *a, tensor *b); // -
-tensor *prod(tensor *a, tensor *b); // *
+tensor *sub(tensor *a, tensor *b); // -
+tensor *mul(tensor *a, tensor *b); // *
 
 // 2. Op. comparazione
 tensor *equal(tensor *a, tensor *b); // =
