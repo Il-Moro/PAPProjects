@@ -6,7 +6,7 @@ TESTS = stackTest tensorTest tensorforthTest tokenTest
 
 all: $(TESTS)
 
-%: %.c $(LIB)/libts.a
+%.o: %.c $(LIB)/libts.a
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB) -lts -lm
 
 clean:

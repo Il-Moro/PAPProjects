@@ -5,8 +5,8 @@ LIB = ./LIB
 
 all: $(TARGET)
 
-$(TARGET): TensorForth.o $(LIB)/libts.a
-	$(CC) $(CFLAGS) -o $@ TensorForth.o -L$(LIB) -lts
+$(TARGET): tensorforth.o $(LIB)/libts.a
+	$(CC) $(CFLAGS) -o $@ tensorforth.o -L$(LIB) -lts
 
 $(LIB)/libts.a: stack.o tensor.o 
 	mkdir -p $(LIB)

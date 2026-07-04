@@ -21,7 +21,7 @@ cd ..
 
 # 2. Compilazione dei test unitari C (se pronti e non vuoti)
 echo "Compilazione dei test unitari C..."
-cd TEST || exit 1
+cd test || exit 1
 make clean > /dev/null 2>&1
 make > /dev/null 2>&1
 make_tests_status=$?
@@ -30,7 +30,7 @@ cd ..
 # Se i test unitari C compilano, li eseguiamo
 if [ $make_tests_status -eq 0 ]; then
     echo -e "${YELLOW}Esecuzione dei test unitari C:${NC}"
-    for test_bin in TEST/stackTest TEST/tensorTest TEST/tensorforthTest TEST/tokenTest; do
+    for test_bin in test/stackTest test/tensorTest test/tensorforthTest test/tokenTest; do
         if [ -f "$test_bin" ]; then
             echo -n "Esecuzione di $test_bin... "
             ./"$test_bin" > /dev/null 2>&1
