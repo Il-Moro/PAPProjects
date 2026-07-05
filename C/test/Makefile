@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g -fopenmp -I../tensorForth
 LIB = ../tensorForth/LIB
 
-TESTS = tensorTest
+TESTS = tensorTest time
 
 all: $(TESTS)
 

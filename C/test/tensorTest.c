@@ -9,7 +9,6 @@
 
 #include "../tensorForth/tensor.h"
 
-#if 0
 // 1. Test di allocazione e reference counting
 void test_alloc_and_ref_counting() {
 	printf("[TEST] Esecuzione test_alloc_and_ref_counting...\n");
@@ -31,6 +30,7 @@ void test_alloc_and_ref_counting() {
 	printf("[TEST] test_alloc_and_ref_counting superato!\n");
 }
 
+#if 0
 // 2. Test di shape, reshape e ravel
 void test_shape_ops() {
 	printf("[TEST] Esecuzione test_shape_ops...\n");
@@ -88,33 +88,25 @@ void test_arithmetic() {
 	assert(r_sum->buffer->data[1] == 14.0f);
 	assert(r_sum->buffer->data[2] == 20.0f);
 
-#if 0
-	tensor *r_diff = diff(a, b);
+	tensor *r_diff = sub(a, b);
 	assert(r_diff->buffer->data[0] == 3.0f);
 	assert(r_diff->buffer->data[1] == 6.0f);
 	assert(r_diff->buffer->data[2] == 10.0f);
 
-	tensor *r_prod = prod(a, b);
+	tensor *r_prod = mul(a, b);
 	assert(r_prod->buffer->data[0] == 10.0f);
 	assert(r_prod->buffer->data[1] == 40.0f);
 	assert(r_prod->buffer->data[2] == 75.0f);
 
 	tensorDeref(a);
 	tensorDeref(b);
-#endif
-#if 0
-	tensorDeref(a); // Deallochiamo temporaneamente a e b direttamente qui per evitare memory leak
-	tensorDeref(b);
 	tensorDeref(r_sum);
-#endif
-#if 0
 	tensorDeref(r_diff);
 	tensorDeref(r_prod);
-#endif
 	printf("[TEST] test_arithmetic superato!\n");
 }
 
-#if 0
+
 // 4. Test Operazioni di Comparazione (=, <, >)
 void test_comparison() {
 	printf("[TEST] Esecuzione test_comparison...\n");
@@ -203,6 +195,7 @@ void test_selection() {
 	printf("[TEST] test_selection superato!\n");
 }
 
+#if 0
 // 7. Test Generazione, Riduzione e Riempimento (?, R, m, M, S, f)
 void test_gen_reduction_fill() {
 	printf("[TEST] Esecuzione test_gen_reduction_fill...\n");
@@ -392,16 +385,88 @@ void test_sum_incompatible_ranks() {
 	}
 }
 
+void test_selection_incompatible_dimensions() {
+	printf("[TEST] Esecuzione test_selection_incompatible_dimensions (si attende una terminazione con errore)...\n");
+	pid_t pid = fork();
+	if (pid < 0) {
+		perror("fork fallito");
+		exit(1);
+	}
+	
+	if (pid == 0) {
+		freopen("/dev/null", "w", stderr);
+		
+		int32_t shape_a[] = {3};
+		int32_t shape_b[] = {4};
+		int32_t shape_mask[] = {3};
+		tensor *a = allocTensor(1, shape_a);
+		tensor *b = allocTensor(1, shape_b);
+		tensor *mask = allocTensor(1, shape_mask);
+		
+		tensor *res = selection(a, b, mask);
+		(void)res;
+		exit(0);
+	} else {
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) {
+			int exit_code = WEXITSTATUS(status);
+			assert(exit_code == 1);
+			printf("[TEST] test_selection_incompatible_dimensions superato (terminato con codice 1)!\n");
+		} else {
+			printf("[TEST] test_selection_incompatible_dimensions FALLITO (crash imprevisto)!\n");
+			assert(0);
+		}
+	}
+}
+
+void test_selection_incompatible_mask() {
+	printf("[TEST] Esecuzione test_selection_incompatible_mask (si attende una terminazione con errore)...\n");
+	pid_t pid = fork();
+	if (pid < 0) {
+		perror("fork fallito");
+		exit(1);
+	}
+	
+	if (pid == 0) {
+		freopen("/dev/null", "w", stderr);
+		
+		int32_t shape_a[] = {3};
+		int32_t shape_b[] = {3};
+		int32_t shape_mask[] = {4};
+		tensor *a = allocTensor(1, shape_a);
+		tensor *b = allocTensor(1, shape_b);
+		tensor *mask = allocTensor(1, shape_mask);
+		
+		tensor *res = selection(a, b, mask);
+		(void)res;
+		exit(0);
+	} else {
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) {
+			int exit_code = WEXITSTATUS(status);
+			assert(exit_code == 1);
+			printf("[TEST] test_selection_incompatible_mask superato (terminato con codice 1)!\n");
+		} else {
+			printf("[TEST] test_selection_incompatible_mask FALLITO (crash imprevisto)!\n");
+			assert(0);
+		}
+	}
+}
+
 int main() {
 	printf("=== AVVIO SUITE COMPLETA TEST TENSOR ===\n");
-	// test_alloc_and_ref_counting();
+	test_alloc_and_ref_counting();
 	// test_shape_ops();
 	test_arithmetic();
 	test_sum_incompatible_dimensions();
 	test_sum_incompatible_ranks();
-	// test_comparison();
-	// test_logical();
-	// test_selection();
+	test_comparison();
+	test_logical();
+	test_selection();
+	test_selection_incompatible_dimensions();
+	test_selection_incompatible_mask();
 	// test_gen_reduction_fill();
 	// test_advanced_ops();
 	printf("=== TUTTI I TEST COMPILATI E PASSATI CON SUCCESSO! ===\n");
