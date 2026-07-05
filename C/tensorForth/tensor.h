@@ -81,5 +81,6 @@ void printTensor(tensor *t); // p
 // ALTRO
 void equalDimensions(int dimensionA, int dimensionB);
 void equalShapes(int rowA, int rowB, int colA, int colB);
+int32_t getTotalElements(tensor *t);
 
 #endif
