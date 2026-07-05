@@ -438,7 +438,12 @@ tensor *selection(tensor *a, tensor *b, tensor *mask){
 }
 
 // 5. Op. specifiche per tensori
-tensor *matrixMul(tensor *a, tensor *b); // @
+tensor *matrixMul(tensor *a, tensor *b){
+    equalDimensions(a->dimensionOfTensor, 2);
+    equalDimensions(b->dimensionOfTensor, 2);
+    equalShapes(a->shape[1], b->shape[0], 0, 0);
+
+}
 tensor *dotProduct(tensor *a, tensor *b); // .
 tensor *conv2D(tensor *a, tensor *kernel); // c
 
@@ -551,8 +556,8 @@ void equalDimensions(int dimensionA, int dimensionB){
     } 
 }
 
-void equalShapes(int rowA, int rowB, int colA, int colB){
-    if((rowA != rowB) || (colA != colB)){
+void equalShapes(int a, int b, int c, int d){
+    if((a != b) || (c != d)){
         fprintf(stderr, "Shape non compatibili\n");
 		exit(1);
     }
