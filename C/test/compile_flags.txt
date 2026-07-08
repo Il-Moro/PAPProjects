@@ -1,0 +1,5 @@
+-I.
+-I../tensorForth/tensor
+-I../tensorForth/stack
+-I../tensorForth/parsing
+-fopenmp

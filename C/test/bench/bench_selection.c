@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include "../../tensorForth/tensor.h"
+#include "tensor.h"
 
 #define NUM_RUNS 10
 

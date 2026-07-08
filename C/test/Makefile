@@ -1,8 +1,11 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -g -fopenmp -I../tensorForth
-LIB = ../tensorForth/LIB
+CC     = gcc
+CFLAGS = -Wall -Wextra -g -fopenmp \
+         -I../tensorForth/tensor \
+         -I../tensorForth/stack \
+         -I../tensorForth/parsing
+LIB    = ../tensorForth/LIB
 
-TESTS = tensorTest time
+TESTS = tensorTest stackTest tokenTest ioTest time
 
 all: $(TESTS)
 

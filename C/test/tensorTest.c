@@ -7,7 +7,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "../tensorForth/tensor.h"
+#include <string.h>
+#include "tensor.h"
 
 // 1. Test di allocazione e reference counting
 void test_alloc_and_ref_counting() {
@@ -30,7 +31,6 @@ void test_alloc_and_ref_counting() {
 	printf("[TEST] test_alloc_and_ref_counting superato!\n");
 }
 
-#if 0
 // 2. Test di shape, reshape e ravel
 void test_shape_ops() {
 	printf("[TEST] Esecuzione test_shape_ops...\n");
@@ -72,7 +72,6 @@ void test_shape_ops() {
 	tensorDeref(t_shape);
 	printf("[TEST] test_shape_ops superato!\n");
 }
-#endif
 
 // 3. Test Operazioni Aritmetiche (+, -, *)
 void test_arithmetic() {
@@ -195,7 +194,6 @@ void test_selection() {
 	printf("[TEST] test_selection superato!\n");
 }
 
-#if 0
 // 7. Test Generazione, Riduzione e Riempimento (?, R, m, M, S, f)
 void test_gen_reduction_fill() {
 	printf("[TEST] Esecuzione test_gen_reduction_fill...\n");
@@ -303,15 +301,44 @@ void test_advanced_ops() {
 	assert(r_matmul->buffer->data[2] == 139.0f);
 	assert(r_matmul->buffer->data[3] == 154.0f);
 
+	// Convolution (c)
+	int32_t shape_img[] = {4, 5};
+	tensor *img = allocTensor(2, shape_img);
+	float img_data[] = {
+		3.0f, 2.0f, 5.0f, 2.0f, 1.0f,
+		7.0f, 2.0f, 7.0f, 1.0f, 9.0f,
+		4.0f, 8.0f, -3.0f, 6.0f, -3.0f,
+		3.0f, 8.0f, 0.0f, 0.0f, 8.0f
+	};
+	memcpy(img->buffer->data, img_data, sizeof(img_data));
+
+	int32_t shape_ker[] = {3, 3};
+	tensor *ker = allocTensor(2, shape_ker);
+	float ker_data[] = {
+		1.0f, -4.0f, 8.0f,
+		1.0f, 2.0f, 7.0f,
+		5.0f, 3.0f, 6.0f
+	};
+	memcpy(ker->buffer->data, ker_data, sizeof(ker_data));
+
+	tensor *r_conv = conv2D(img, ker);
+	assert(r_conv != NULL);
+	assert(r_conv->dimensionOfTensor == 2);
+	assert(r_conv->shape[0] == 4);
+	assert(r_conv->shape[1] == 5);
+	assert(r_conv->buffer->data[0] == 53.0f); // centered at 0,0
+
 	tensorDeref(v1);
 	tensorDeref(v2);
 	tensorDeref(r_dot);
 	tensorDeref(ma);
 	tensorDeref(mb);
 	tensorDeref(r_matmul);
+	tensorDeref(img);
+	tensorDeref(ker);
+	tensorDeref(r_conv);
 	printf("[TEST] test_advanced_ops superato!\n");
 }
-#endif
 
 // Test di robustezza: verifica che il programma si interrompa su errore
 void test_sum_incompatible_dimensions() {
@@ -455,10 +482,99 @@ void test_selection_incompatible_mask() {
 	}
 }
 
+void test_matrix_mul() {
+	printf("[TEST] Esecuzione test_matrix_mul...\n");
+	int32_t shape_a[] = {2, 3};
+	tensor *ma = allocTensor(2, shape_a);
+	ma->buffer->data[0] = 1.0f; ma->buffer->data[1] = 2.0f; ma->buffer->data[2] = 3.0f;
+	ma->buffer->data[3] = 4.0f; ma->buffer->data[4] = 5.0f; ma->buffer->data[5] = 6.0f;
+
+	int32_t shape_b[] = {3, 2};
+	tensor *mb = allocTensor(2, shape_b);
+	mb->buffer->data[0] = 7.0f;  mb->buffer->data[1] = 8.0f;
+	mb->buffer->data[2] = 9.0f;  mb->buffer->data[3] = 10.0f;
+	mb->buffer->data[4] = 11.0f; mb->buffer->data[5] = 12.0f;
+
+	tensor *r_matmul = matrixMul(ma, mb);
+	assert(r_matmul != NULL);
+	assert(r_matmul->dimensionOfTensor == 2);
+	assert(r_matmul->shape[0] == 2);
+	assert(r_matmul->shape[1] == 2);
+	
+	// Rigo 1: [1*7 + 2*9 + 3*11 = 58], [1*8 + 2*10 + 3*12 = 64]
+	assert(r_matmul->buffer->data[0] == 58.0f);
+	assert(r_matmul->buffer->data[1] == 64.0f);
+	// Rigo 2: [4*7 + 5*9 + 6*11 = 139], [4*8 + 5*10 + 6*12 = 154]
+	assert(r_matmul->buffer->data[2] == 139.0f);
+	assert(r_matmul->buffer->data[3] == 154.0f);
+
+	tensorDeref(ma);
+	tensorDeref(mb);
+	tensorDeref(r_matmul);
+	printf("[TEST] test_matrix_mul superato!\n");
+}
+
+void test_matrix_mul_incompatible_dimensions() {
+	printf("[TEST] Esecuzione test_matrix_mul_incompatible_dimensions (si attende una terminazione con errore)...\n");
+	pid_t pid = fork();
+	if (pid < 0) {
+		perror("fork fallito");
+		exit(1);
+	}
+	
+	if (pid == 0) {
+		freopen("/dev/null", "w", stderr);
+		
+		int32_t shape_a[] = {2, 3};
+		int32_t shape_b[] = {2, 2}; // Non compatibili! cols_A = 3 != rows_B = 2
+		tensor *ma = allocTensor(2, shape_a);
+		tensor *mb = allocTensor(2, shape_b);
+		
+		tensor *res = matrixMul(ma, mb);
+		(void)res;
+		exit(0);
+	} else {
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) {
+			int exit_code = WEXITSTATUS(status);
+			assert(exit_code == 1);
+			printf("[TEST] test_matrix_mul_incompatible_dimensions superato (terminato con codice 1)!\n");
+		} else {
+			printf("[TEST] test_matrix_mul_incompatible_dimensions FALLITO (crash imprevisto)!\n");
+			assert(0);
+		}
+	}
+}
+
+void test_random_tensor() {
+	printf("[TEST] Esecuzione test_random_tensor...\n");
+	int32_t shape_dims[] = {2};
+	tensor *target_shape = allocTensor(1, shape_dims);
+	target_shape->buffer->data[0] = 3.0f;
+	target_shape->buffer->data[1] = 4.0f;
+
+	tensor *r_rand = randomTensor(target_shape);
+	assert(r_rand != NULL);
+	assert(r_rand->dimensionOfTensor == 2);
+	assert(r_rand->shape[0] == 3);
+	assert(r_rand->shape[1] == 4);
+	assert(getTotalElements(r_rand) == 12);
+
+	for (int i = 0; i < 12; i++) {
+		assert(r_rand->buffer->data[i] >= 0.0f);
+		assert(r_rand->buffer->data[i] <= 1.0f);
+	}
+
+	tensorDeref(target_shape);
+	tensorDeref(r_rand);
+	printf("[TEST] test_random_tensor superato!\n");
+}
+
 int main() {
 	printf("=== AVVIO SUITE COMPLETA TEST TENSOR ===\n");
 	test_alloc_and_ref_counting();
-	// test_shape_ops();
+	test_shape_ops();
 	test_arithmetic();
 	test_sum_incompatible_dimensions();
 	test_sum_incompatible_ranks();
@@ -467,8 +583,11 @@ int main() {
 	test_selection();
 	test_selection_incompatible_dimensions();
 	test_selection_incompatible_mask();
-	// test_gen_reduction_fill();
-	// test_advanced_ops();
+	test_matrix_mul();
+	test_matrix_mul_incompatible_dimensions();
+	test_random_tensor();
+	test_gen_reduction_fill();
+	test_advanced_ops();
 	printf("=== TUTTI I TEST COMPILATI E PASSATI CON SUCCESSO! ===\n");
 	return 0;
 }
