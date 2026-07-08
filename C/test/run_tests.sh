@@ -21,7 +21,7 @@ cd ..
 
 # 2. Compilazione dei test unitari C (se pronti e non vuoti)
 echo "Compilazione dei test unitari C..."
-cd TEST || exit 1
+cd test || exit 1
 make clean > /dev/null 2>&1
 make > /dev/null 2>&1
 make_tests_status=$?
@@ -30,14 +30,15 @@ cd ..
 # Se i test unitari C compilano, li eseguiamo
 if [ $make_tests_status -eq 0 ]; then
     echo -e "${YELLOW}Esecuzione dei test unitari C:${NC}"
-    for test_bin in TEST/stackTest TEST/tensorTest TEST/tensorforthTest TEST/tokenTest; do
+    for test_bin in test/stackTest test/tensorTest test/tensorforthTest test/tokenTest; do
         if [ -f "$test_bin" ]; then
-            echo -n "Esecuzione di $test_bin... "
-            ./"$test_bin" > /dev/null 2>&1
-            if [ $? -eq 0 ]; then
-                echo -e "${GREEN}OK${NC}"
+            echo -e "\n${YELLOW}--- Esecuzione di $test_bin ---${NC}"
+            ./"$test_bin"
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+                echo -e "${GREEN}Esito: OK${NC}"
             else
-                echo -e "${RED}FALLITO${NC}"
+                echo -e "${RED}Esito: FALLITO (Codice d'uscita: $exit_code)${NC}"
             fi
         fi
     done
@@ -62,7 +63,7 @@ if [ $# -gt 0 ]; then
     fi
     
     echo -e "${YELLOW}Esecuzione di $test_file in corso...${NC}"
-    ./tensorForth/TensorForth "$test_file"
+    ./tensorForth/tensorforth "$test_file"
     exit_code=$?
     
     if [ $exit_code -eq 0 ]; then
@@ -93,7 +94,7 @@ for ex in "${EXAMPLES[@]}"; do
     echo -n "Test di examples/$ex... "
     
     # Esegue il programma silenziosamente
-    ./tensorForth/TensorForth "examples/$ex" > /dev/null 2>&1
+    ./tensorForth/tensorforth "examples/$ex" > /dev/null 2>&1
     exit_code=$?
     
     if [ $exit_code -eq 0 ]; then

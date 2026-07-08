@@ -2,11 +2,11 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g -fopenmp -I../tensorForth
 LIB = ../tensorForth/LIB
 
-TESTS = stackTest tensorTest tensorforthTest tokenTest
+TESTS = tensorTest time
 
 all: $(TESTS)
 
-%: %.c $(LIB)/libts.a
+%: %.c
 	$(CC) $(CFLAGS) -o $@ $< -L$(LIB) -lts -lm
 
 clean:

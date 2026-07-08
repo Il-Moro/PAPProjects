@@ -1,21 +1,33 @@
 TARGET = tensorforth
 CC = gcc
-CFLAGS = -Wall -Wextra -g -fopenmp -march=native
+CFLAGS = -Wall -Wextra -g -fopenmp -march=native -I./tensor -I./stack -I./parsing
 LIB = ./LIB
+
+# Sorgenti per cartella
+TENSOR_SRCS = tensor/tensor.c tensor/tensor_ops.c tensor/tensor_io.c
+STACK_SRCS = stack/stack.c
+PARSE_SRCS = parsing/token.c
+
+LIB_SRCS = $(TENSOR_SRCS) $(STACK_SRCS) $(PARSE_SRCS)
+LIB_OBJS = $(LIB_SRCS:.c=.o)
 
 all: $(TARGET)
 
-$(TARGET): TensorForth.o $(LIB)/libts.a
-	$(CC) $(CFLAGS) -o $@ TensorForth.o -L$(LIB) -lts
+$(TARGET): tensorforth.o $(LIB)/libts.a
+	$(CC) $(CFLAGS) -o $@ tensorforth.o -L$(LIB) -lts
 
-$(LIB)/libts.a: stack.o tensor.o 
+$(LIB)/libts.a: $(LIB_OBJS)
 	mkdir -p $(LIB)
 	ar r $@ $^
 
-%.o: %.c $(wildcard *.h)
-	$(CC) $(CFLAGS) -c $<
+# Regola generica: compila ogni .c nella sua stessa cartella
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+tensorforth.o: tensorforth.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) tensorforth.o $(LIB_OBJS)
 	rm -rf $(LIB)
