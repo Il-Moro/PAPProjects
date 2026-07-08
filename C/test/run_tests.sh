@@ -30,7 +30,7 @@ cd ..
 # Se i test unitari C compilano, li eseguiamo
 if [ $make_tests_status -eq 0 ]; then
     echo -e "${YELLOW}Esecuzione dei test unitari C:${NC}"
-    for test_bin in test/stackTest test/tensorTest test/tensorforthTest test/tokenTest; do
+    for test_bin in test/stackTest test/tensorTest test/tokenTest test/ioTest; do
         if [ -f "$test_bin" ]; then
             echo -e "\n${YELLOW}--- Esecuzione di $test_bin ---${NC}"
             ./"$test_bin"
