@@ -3,7 +3,7 @@
 # Matricola: SM3201475
 
 import numpy as np
-from renderingEngine.exceptions.customExceptions import renderingException
+from renderingEngine.customExceptions import renderingException
 
 # Blitter per copiare tile e sprite trasformati sul frame buffer
 class Blitter:

@@ -56,3 +56,10 @@ dkms.conf
 
 # file eseguibile
 tensorforth
+
+# Python virtual environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc

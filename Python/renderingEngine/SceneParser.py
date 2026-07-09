@@ -5,7 +5,7 @@
 import json
 import os
 import numpy as np
-from renderingEngine.exceptions.customExceptions import invalidSceneException
+from renderingEngine.customExceptions import invalidSceneException
 
 # Lettura e validazione dei parametri della scena da file JSON
 class SceneParser:

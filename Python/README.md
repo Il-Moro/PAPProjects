@@ -18,13 +18,13 @@ pip install numpy pillow
 ## Esecuzione del Renderer da Riga di Comando
 Il programma può essere avviato specificando i 5 file richiesti nell'ordine definito:
 ```bash
-python renderingEngine/main.py <palette.json> <scene.json> <tiles.bin> <sprites.bin> <output.png>
+python main.py <palette.json> <scene.json> <tiles.bin> <sprites.bin> <output.png>
 ```
 
 ### Esempio Pratico
 Per renderizzare la scena di esempio inclusa nel progetto:
 ```bash
-python renderingEngine/main.py example/palette.json example/scene.json example/tiles.bin example/sprites.bin output.png
+python main.py example/palette.json example/scene.json example/tiles.bin example/sprites.bin output.png
 ```
 Questo genererà un file `output.png` che corrisponde esattamente al file di riferimento `example/reference.png`.
 

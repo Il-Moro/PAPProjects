@@ -5,13 +5,13 @@
 import os
 import sys
 
-# Aggiunge la cartella superiore a sys.path per permettere l'avvio diretto di main.py
-parentDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if parentDir not in sys.path:
-    sys.path.insert(0, parentDir)
+# Aggiunge la cartella corrente a sys.path per permettere la corretta importazione di renderingEngine
+currentDir = os.path.dirname(os.path.abspath(__file__))
+if currentDir not in sys.path:
+    sys.path.insert(0, currentDir)
 
-from renderingEngine.pipeline.RenderingPipeline import RenderingPipeline
-from renderingEngine.exceptions.customExceptions import renderingEngineException
+from renderingEngine.RenderingPipeline import RenderingPipeline
+from renderingEngine.customExceptions import renderingEngineException
 
 def main():
     # Verifica che siano stati passati esattamente 5 argomenti

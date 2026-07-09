@@ -7,12 +7,12 @@ import unittest
 import numpy as np
 from PIL import Image
 
-from renderingEngine.core.palette import Palette
-from renderingEngine.core.virtualVram import VirtualVRAM
-from renderingEngine.scene.SceneParser import SceneParser
-from renderingEngine.blitter.blitter import Blitter
-from renderingEngine.pipeline.RenderingPipeline import RenderingPipeline
-from renderingEngine.exceptions.customExceptions import (
+from renderingEngine.palette import Palette
+from renderingEngine.virtualVram import VirtualVRAM
+from renderingEngine.SceneParser import SceneParser
+from renderingEngine.blitter import Blitter
+from renderingEngine.RenderingPipeline import RenderingPipeline
+from renderingEngine.customExceptions import (
     invalidPaletteException,
     invalidVramException,
     invalidSceneException,

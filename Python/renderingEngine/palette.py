@@ -4,7 +4,7 @@
 
 import json
 import os
-from renderingEngine.exceptions.customExceptions import invalidPaletteException
+from renderingEngine.customExceptions import invalidPaletteException
 
 class Palette:
     # Rappresenta la palette di 16 colori indicizzati.

@@ -4,11 +4,11 @@
 
 import numpy as np
 from PIL import Image
-from renderingEngine.core.palette import Palette
-from renderingEngine.core.virtualVram import VirtualVRAM
-from renderingEngine.scene.SceneParser import SceneParser
-from renderingEngine.blitter.blitter import Blitter
-from renderingEngine.exceptions.customExceptions import renderingException, renderingEngineException
+from renderingEngine.palette import Palette
+from renderingEngine.virtualVram import VirtualVRAM
+from renderingEngine.SceneParser import SceneParser
+from renderingEngine.blitter import Blitter
+from renderingEngine.customExceptions import renderingException, renderingEngineException
 
 # Pipeline principale di coordinamento del rendering
 class RenderingPipeline:

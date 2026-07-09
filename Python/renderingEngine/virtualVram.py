@@ -4,7 +4,7 @@
 
 import os
 import numpy as np
-from renderingEngine.exceptions.customExceptions import invalidVramException
+from renderingEngine.customExceptions import invalidVramException
 
 # Caricamento e decodifica delle texture (tile e sprite) dai file binari
 class VirtualVRAM:
