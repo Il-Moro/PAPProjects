@@ -1,6 +1,6 @@
 TARGET = tensorforth
 CC = gcc
-CFLAGS = -Wall -Wextra -g -fopenmp -march=native -I./tensor -I./stack -I./parsing
+CFLAGS = -Wall -Wextra -O3 -fopenmp -march=native -I./tensor -I./stack -I./parsing
 LIB = ./LIB
 
 # Sorgenti per cartella

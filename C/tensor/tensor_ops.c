@@ -714,6 +714,7 @@ tensor *relu(tensor * t) {
 // Minimo elemento per elemento tra a e b.
 // Input: due tensori della stessa forma. Output: tensore risultante.
 tensor *minTensor(tensor * a, tensor * b) {
+	equalDimensions(a->dimensionOfTensor, b->dimensionOfTensor);
 	equalShapes(a->shape[0], b->shape[0], a->shape[1], b->shape[1]);
 
 	int32_t size = getTotalElements(a);

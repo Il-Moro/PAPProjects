@@ -5,10 +5,9 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 
-#include <stddef.h> // size_t
-#include <stdint.h> // int32_t
-// TODO: da togliere (?)
-#include <immintrin.h> // vettorizzazione -> forse non serve
+#include <stddef.h>    // size_t
+#include <stdint.h>    // int32_t
+#include <sys/types.h> // off_t
 
 typedef struct {
 	int32_t referenceCount;
@@ -23,7 +22,7 @@ typedef struct {
 	int32_t dimensionOfTensor; // 32
 	int32_t referenceCount;	   // 32
 	tensor_buffer *buffer;	   // 64
-} tensor;					   // // 188 bit
+} tensor;					   // 192 bit
 
 // Struttura dell'header su disco per i file binari di tensori.
 // MAX_DIM è fissato a 2. data_offset indica l'offset (in byte dall'inizio
