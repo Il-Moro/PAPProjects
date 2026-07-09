@@ -42,6 +42,7 @@ class testRenderingEngine(unittest.TestCase):
             os.remove(self.outputPath)
             
     def testPaletteLoadingAndValidation(self):
+        print("\n[TEST] testPaletteLoadingAndValidation...")
         # Caricamento corretto
         validPalette = Palette(self.palettePath)
         self.assertEqual(len(validPalette.colorsList), 16)
@@ -77,8 +78,10 @@ class testRenderingEngine(unittest.TestCase):
         # Valore fuori range 0-255
         with self.assertRaises(invalidPaletteException):
             paletteInstance.validateAndSetPalette([[0, 0, 0]] * 15 + [[0, 0, 256]])
+        print("[TEST] testPaletteLoadingAndValidation superato!")
             
     def testVirtualVramLoadingAndDecoding(self):
+        print("[TEST] testVirtualVramLoadingAndDecoding...")
         vramInstance = VirtualVRAM()
         
         # Caricamento corretto delle matrici
@@ -102,8 +105,10 @@ class testRenderingEngine(unittest.TestCase):
         finally:
             if os.path.exists(dummyFilePath):
                 os.remove(dummyFilePath)
+        print("[TEST] testVirtualVramLoadingAndDecoding superato!")
                 
     def testSceneParsingAndValidation(self):
+        print("[TEST] testSceneParsingAndValidation...")
         parserInstance = SceneParser(self.scenePath)
         self.assertEqual(parserInstance.transparentIndex, 0)
         self.assertEqual(parserInstance.tileMap.shape, (15, 20))
@@ -144,8 +149,10 @@ class testRenderingEngine(unittest.TestCase):
         }
         with self.assertRaises(invalidSceneException):
             testParser.validateAndSetScene(invalidRot)
+        print("[TEST] testSceneParsingAndValidation superato!")
             
     def testBlitterTransformations(self):
+        print("[TEST] testBlitterTransformations...")
         blitterInstance = Blitter()
         frameBuffer = np.zeros((480, 640), dtype=np.uint8)
         spriteSheet = np.zeros((256, 256), dtype=np.uint8)
@@ -168,8 +175,10 @@ class testRenderingEngine(unittest.TestCase):
         frameBuffer.fill(0)
         blitterInstance.blitSprite(frameBuffer, 0, -60, 0, False, False, 0, spriteSheet, 0)
         self.assertEqual(frameBuffer[0, 1], 9)
+        print("[TEST] testBlitterTransformations superato!")
         
     def testRenderingPipelineIntegration(self):
+        print("[TEST] testRenderingPipelineIntegration...")
         pipelineInstance = RenderingPipeline()
         
         # Avvia rendering
@@ -191,6 +200,8 @@ class testRenderingEngine(unittest.TestCase):
         
         diff = np.sum(genArr != refArr)
         self.assertEqual(diff, 0, f"Rendering non corrispondente! Pixel diversi: {diff}")
+        print("[TEST] testRenderingPipelineIntegration superato!")
 
 if __name__ == "__main__":
-    unittest.main()
+    print("=== AVVIO SUITE COMPLETA TEST RENDERING ENGINE ===")
+    unittest.main(verbosity=2)
