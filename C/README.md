@@ -11,13 +11,12 @@ Questo progetto implementa la prima parte dell'esame di Programmazione Avanzata 
 * Supporto per **OpenMP** e vettorizzazione **AVX2** (incluso di default nelle CPU moderne)
 
 ## Struttura della Directory C
-* `tensorForth/`: contiene il codice sorgente dell'interprete.
+* `parsing/`, `stack/`, `tensor/`: contengono i sorgenti dell'interprete.
 * `examples/`: programmi d'esempio in formato `.tensorforth`.
 
 ## Compilazione
-Per compilare l'eseguibile `tensorforth`, posizionati nella cartella `tensorForth` ed esegui `make`:
+Per compilare l'eseguibile `tensorforth`, posizionati nella cartella `C/` ed esegui `make`:
 ```bash
-cd tensorForth
 make
 ```
 Questo genererà l'eseguibile `tensorforth` nella stessa cartella.
@@ -25,11 +24,11 @@ Questo genererà l'eseguibile `tensorforth` nella stessa cartella.
 ## Esecuzione di un Programma
 Per eseguire un file TensorForth:
 ```bash
-./tensorForth/tensorforth <percorso_sorgente.tensorforth>
+./tensorforth <percorso_sorgente.tensorforth>
 ```
 Ad esempio:
 ```bash
-./tensorForth/tensorforth examples/image_blur.tensorforth
+./tensorforth examples/image_blur.tensorforth
 ```
 
 ## Esecuzione degli Esempi
@@ -38,5 +37,5 @@ Per verificare il funzionamento dell'interprete, puoi eseguire uno dei programmi
 ## Pulizia dei file compilati
 Per ripulire i file temporanei `.o`, `.a` e l'eseguibile prima della consegna:
 ```bash
-cd tensorForth && make clean
+make clean
 ```

@@ -10,14 +10,13 @@ echo -e "${YELLOW}=== Avvio Suite di Test TensorForth ===${NC}"
 
 # 1. Compilazione del programma principale
 echo "Compilazione dell'interprete..."
-cd "$(dirname "$0")/../tensorForth" || exit 1
+cd "$(dirname "$0")/.." || exit 1
 make clean > /dev/null 2>&1
 make
 if [ $? -ne 0 ]; then
     echo -e "${RED}Errore di compilazione dell'interprete!${NC}"
     exit 1
 fi
-cd ..
 
 # 2. Compilazione dei test unitari C (se pronti e non vuoti)
 echo "Compilazione dei test unitari C..."
@@ -63,7 +62,7 @@ if [ $# -gt 0 ]; then
     fi
     
     echo -e "${YELLOW}Esecuzione di $test_file in corso...${NC}"
-    ./tensorForth/tensorforth "$test_file"
+    ./tensorforth "$test_file"
     exit_code=$?
     
     if [ $exit_code -eq 0 ]; then
@@ -94,7 +93,7 @@ for ex in "${EXAMPLES[@]}"; do
     echo -n "Test di examples/$ex... "
     
     # Esegue il programma silenziosamente
-    ./tensorForth/tensorforth "examples/$ex" > /dev/null 2>&1
+    ./tensorforth "examples/$ex" > /dev/null 2>&1
     exit_code=$?
     
     if [ $exit_code -eq 0 ]; then
