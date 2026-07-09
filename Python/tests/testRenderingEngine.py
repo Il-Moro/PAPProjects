@@ -3,9 +3,15 @@
 # Matricola: SM3201475
 
 import os
+import sys
 import unittest
 import numpy as np
 from PIL import Image
+
+# Aggiunge la cartella contenitrice (Python/) a sys.path per consentire l'avvio diretto del test
+parentDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parentDir not in sys.path:
+    sys.path.insert(0, parentDir)
 
 from renderingEngine.palette import Palette
 from renderingEngine.virtualVram import VirtualVRAM
@@ -22,13 +28,14 @@ from renderingEngine.customExceptions import (
 class testRenderingEngine(unittest.TestCase):
     
     def setUp(self):
-        self.exampleDir = "example"
+        testDir = os.path.dirname(os.path.abspath(__file__))
+        self.exampleDir = os.path.join(os.path.dirname(testDir), "example")
         self.palettePath = os.path.join(self.exampleDir, "palette.json")
         self.scenePath = os.path.join(self.exampleDir, "scene.json")
         self.tilesPath = os.path.join(self.exampleDir, "tiles.bin")
         self.spritesPath = os.path.join(self.exampleDir, "sprites.bin")
         self.referencePath = os.path.join(self.exampleDir, "reference.png")
-        self.outputPath = "example_output_test.png"
+        self.outputPath = os.path.join(testDir, "example_output_test.png")
         
     def tearDown(self):
         if os.path.exists(self.outputPath):
